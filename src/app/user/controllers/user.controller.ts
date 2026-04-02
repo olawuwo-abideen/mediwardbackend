@@ -68,7 +68,7 @@ return await this.userService.updateProfile(payload, user);
 }
 
 
-@Get('user/treatment')
+@Get('/treatment')
 @ApiOperation({ summary: 'Get current user treatments' })
 @ApiResponse({
   status: HttpStatus.OK,
@@ -79,8 +79,40 @@ async getMyTreatments(@Request() req: RequestWithUser) {
 }
 
 
+@Get('/transfer')
+@ApiOperation({ summary: 'Get current user transfers' })
+@ApiResponse({
+  status: HttpStatus.OK,
+  description: 'User transfers retrieved successfully.',
+})
+async getMyTransfers(@Request() req: RequestWithUser) {
+  return this.userService.getCurrentUserTransfers(req.user);
+}
 
-@Get('user/ward')
+
+@Get('/admission')
+@ApiOperation({ summary: 'Get current user admission' })
+@ApiResponse({
+  status: HttpStatus.OK,
+  description: 'User admissions retrieved successfully.',
+})
+async getMyAdmissions(@Request() req: RequestWithUser) {
+  return this.userService.getCurrentUserAdmissions(req.user);
+}
+
+@ApiBearerAuth()
+@Get('/discharge')
+@ApiOperation({ summary: 'Get current user discharge history' })
+@ApiResponse({
+  status: HttpStatus.OK,
+  description: 'User discharges history retrieved successfully.',
+})
+async getMyDischarges(@Request() req: RequestWithUser) {
+  return this.userService.getCurrentUserDischarges(req.user);
+}
+
+
+@Get('/ward')
 @ApiOperation({ summary: 'Get current user ward' })
 @ApiResponse({
   status: HttpStatus.OK,
@@ -93,7 +125,7 @@ async getMyWard(@Request() req: RequestWithUser) {
 
 
 
-@Get('user/team')
+@Get('/team')
 @ApiOperation({ summary: 'Get current user team' })
 @ApiResponse({
   status: HttpStatus.OK,

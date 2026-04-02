@@ -4,35 +4,39 @@ import { Exclude } from 'class-transformer';
 
 @Entity('treatment')
 export class Treatment {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+@PrimaryGeneratedColumn('uuid')
+id: string;
 
-  @Column()
-  symptoms: string;
+@Column()
+symptoms: string;
 
-  @Column()
-  diagnosis: string;
+@Column()
+diagnosis: string;
 
-  @Column()
-  medication: string;
+@Column()
+medication: string;
 
 
-  @ManyToOne(() => User, (user) => user.treatments,  { onDelete: 'CASCADE' })
-  patient: User;
+@Column({ type: 'timestamp', nullable: true })
+prescriptiondate: Date;
 
-  @CreateDateColumn({
-  name: 'created_at',
-  })
-  @Exclude()
-  createdAt: Date;
-  
-  @UpdateDateColumn({
-  name: 'updated_at',
-  })
-  @Exclude()
-  updatedAt: Date;
-  
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  @Exclude()
-  deletedAt: Date;
+
+@ManyToOne(() => User, (user) => user.treatments,  { onDelete: 'CASCADE' })
+patient: User;
+
+@CreateDateColumn({
+name: 'created_at',
+})
+@Exclude()
+createdAt: Date;
+
+@UpdateDateColumn({
+name: 'updated_at',
+})
+@Exclude()
+updatedAt: Date;
+
+@DeleteDateColumn({ name: 'deleted_at', nullable: true })
+@Exclude()
+deletedAt: Date;
 }  

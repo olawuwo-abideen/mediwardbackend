@@ -6,7 +6,7 @@ import { User, UserRole } from '../../../shared/entities/user.entity';
 import { PaginationDto } from '../../../shared/dtos/pagination.dto';
 import { AuthGuard } from '../../../app/auth/guards/auth.guard';
 import { Roles } from '../../../shared/decorators/roles.decorator';
-import { AdmitPatientDto } from '../dto/patient.dto';
+import { AdmitPatientDto, DischargePatientDto } from '../dto/patient.dto';
 
 @ApiBearerAuth()
 @ApiTags('Patient')
@@ -69,18 +69,20 @@ return await this.patientService.getPatient(id)
 @Roles(UserRole.DOCTOR, UserRole.NURSE)
 async admitPatient(
   @Param('patientId') patientId: string,
-  
   @Body() admitPatientDto: AdmitPatientDto, 
 ) {
   return this.patientService.admitPatient(patientId, admitPatientDto);
 }
 
-  @Post('discharge/:patientId')
-  @ApiOperation({ summary: 'Discharge a patient (doctor only)' })
-  @Roles(UserRole.DOCTOR)
-  async dischargePatient(@Param('patientId') patientId: string) {
-    return this.patientService.dischargePatient(patientId);
-  }
+@Post('discharge/:patientId')
+@ApiOperation({ summary: 'Discharge a patient (doctor only)' })
+@Roles(UserRole.DOCTOR)
+async dischargePatient(
+  @Param('patientId') patientId: string,
+  @Body() data: DischargePatientDto,
+) {
+  return this.patientService.dischargePatient(patientId, data);
+}
 
   @Get('history/:patientId')
   @ApiOperation({ summary: 'Get admission history of a patient' })

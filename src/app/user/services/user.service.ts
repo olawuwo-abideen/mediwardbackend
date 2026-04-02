@@ -14,6 +14,8 @@ import {  UpdateProfileDto } from '../dto/update-profile.dto';
 import { Treatment } from 'src/shared/entities/treatment.entity';
 import { Ward } from 'src/shared/entities/ward.entity';
 import { Team } from 'src/shared/entities/team.entity';
+import { Transfer } from 'src/shared/entities/transfer.entity';
+import { Admission } from 'src/shared/entities/admission.entity';
 
 @Injectable()
 export class UserService {
@@ -21,7 +23,9 @@ constructor(
 @InjectRepository(User) private readonly userRepository: Repository<User>,
 @InjectRepository(Treatment) private readonly treatmentRepository: Repository<Treatment>,
 @InjectRepository(Ward) private readonly wardRepository: Repository<Ward>,
-@InjectRepository(Team) private readonly teamRepository: Repository<Team>
+@InjectRepository(Team) private readonly teamRepository: Repository<Team>,
+@InjectRepository(Transfer) private readonly transferRepository: Repository<Transfer>,
+@InjectRepository(Admission) private readonly admissionRepository: Repository<Admission>
 
 ) {}
 
@@ -126,6 +130,34 @@ async getCurrentUserTreatments(
 }
 
 
+async getCurrentUserTransfers(
+  user: User,
+): Promise<{ transfers: Transfer[] }> {
+  // Ensure user is a patient
+  if (user.role !== UserRole.PATIENT) {
+    throw new BadRequestException('Only patients have transfers.');
+  }
+  const transfers = await this.transferRepository.find({
+    where: { patient: { id: user.id } }
+  });
+  return { transfers };
+}
+
+
+async getCurrentUserAdmissions(
+  user: User,
+): Promise<{ admissions: Admission[] }> {
+  // Ensure user is a patient
+  if (user.role !== UserRole.PATIENT) {
+    throw new BadRequestException('Only patients have admissions.');
+  }
+  const admissions = await this.admissionRepository.find({
+    where: { patient: { id: user.id } }
+  });
+  return { admissions };
+}
+
+
 async getCurrentUserWard(user: User): Promise<{ ward: Ward[] }> {
   if (user.role !== UserRole.PATIENT) {
     throw new BadRequestException('Only patients have wards.');
@@ -139,6 +171,28 @@ async getCurrentUserWard(user: User): Promise<{ ward: Ward[] }> {
   return { ward };
 }
 
+
+async getCurrentUserDischarges(user: User) {
+  const discharges = await this.admissionRepository
+    .createQueryBuilder('admission')
+    .leftJoin('admission.patient', 'patient')
+    .select([
+      'admission.dischargedAt AS dischargedAt',
+      'admission.dischargeReason AS dischargeReason',
+    ])
+    .where('patient.id = :userId', { userId: user.id })
+    .andWhere('admission.dischargedAt IS NOT NULL')
+    .orderBy('admission.dischargedAt', 'DESC')
+    .getRawMany();
+
+  return {
+    message: 'User discharge history retrieved successfully.',
+    data: discharges.map((item) => ({
+      dischargedAt: item.dischargedAt,
+      dischargeReason: item.dischargeReason,
+    })),
+  };
+}
 
 async getCurrentUserTeam(user: User): Promise<{ team: Team[] }> {
   if (user.role !== UserRole.DOCTOR && user.role !== UserRole.NURSE) {

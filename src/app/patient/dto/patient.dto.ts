@@ -29,3 +29,20 @@ reasonforadmission: string;
 
 
 
+export class DischargePatientDto {
+
+@ApiProperty({
+description: 'The reason for discharge',
+example: "Patient recovered and is stable",
+})
+@IsString()
+@IsNotEmpty()
+reason: string;
+
+
+
+
+
+}
+
+

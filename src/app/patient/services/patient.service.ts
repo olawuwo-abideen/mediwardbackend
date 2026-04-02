@@ -136,10 +136,7 @@ console.log(this.dataSource);
       admittedAt: new Date(),
       reasonforadmission,
     });
-
     await manager.save(admission);
-
-    // 7. Increment occupancy
     ward.currentoccupancy += 1;
     await manager.save(ward);
 
@@ -148,8 +145,14 @@ console.log(this.dataSource);
 }
 
 
-async dischargePatient(patientId: string): Promise<{ message: string }> {
-  const patient = await this.userRepository.findOne({ where: { id: patientId } });
+async dischargePatient(
+  patientId: string,
+  data: { reason: string },
+): Promise<{ message: string }> {
+
+  const patient = await this.userRepository.findOne({
+    where: { id: patientId },
+  });
 
   if (!patient) {
     throw new NotFoundException(`Patient not found.`);
@@ -165,6 +168,8 @@ async dischargePatient(patientId: string): Promise<{ message: string }> {
 
   admission.isAdmitted = false;
   admission.dischargedAt = new Date();
+  admission.dischargeReason = data.reason;
+
   await this.admissionRepository.save(admission);
 
   return { message: 'Patient discharged successfully.' };
@@ -174,7 +179,7 @@ async getAdmissionHistory(patientId: string): Promise<{ message: string; history
   const patient = await this.userRepository.findOne({ where: { id: patientId } });
 
   if (!patient) {
-    throw new NotFoundException(`Patient with ID ${patientId} not found.`);
+    throw new NotFoundException(`Patient not found.`);
   }
 
   const admissions = await this.admissionRepository.find({
@@ -194,10 +199,14 @@ async getAdmissionHistory(patientId: string): Promise<{ message: string; history
   };
 }
 
+
+
+
+
 async getCurrentStatus(patientId: string): Promise<{ message: string; status: PatientStatus }> {
   const patient = await this.userRepository.findOne({ where: { id: patientId } });
   if (!patient) {
-    throw new NotFoundException(`Patient with ID ${patientId} not found.`);
+    throw new NotFoundException(`Patient not found.`);
   }
   const active = await this.admissionRepository.findOne({
     where: { patient: { id: patientId }, isAdmitted: true },
