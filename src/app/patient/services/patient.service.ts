@@ -185,7 +185,7 @@ async getAdmissionHistory(patientId: string): Promise<{ message: string; history
   const admissions = await this.admissionRepository.find({
     where: { patient: { id: patientId } },
     order: { admittedAt: 'DESC' },
-    select: ['admittedAt', 'dischargedAt'], // Only retrieve relevant fields
+    select: ['admittedAt', 'dischargedAt'], 
   });
 
   const history = admissions.map(adm => ({

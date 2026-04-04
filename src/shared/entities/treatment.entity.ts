@@ -17,7 +17,7 @@ diagnosis: string;
 medication: string;
 
 
-@Column({ type: 'timestamp', nullable: true })
+@Column({ type: 'timestamp', nullable: true, default: () => 'CURRENT_TIMESTAMP' })
 prescriptiondate: Date;
 
 

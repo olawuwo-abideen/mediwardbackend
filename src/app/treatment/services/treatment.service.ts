@@ -29,10 +29,10 @@ async createTreatment(
   }
 
   const treatment = this.treatmentRepository.create({
-    patient,
     symptoms: admitPatientDto.symptoms,
     diagnosis: admitPatientDto.diagnosis,
     medication: admitPatientDto.medication,
+    patient: patient
   });
 
   const savedTreatment = await this.treatmentRepository.save(treatment);
