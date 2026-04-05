@@ -16,11 +16,9 @@ app.useGlobalInterceptors(new HttpResponseInterceptor());
 app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
 app.enableCors({
-origin: '*',
-methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-credentials: true,
-    
+  origin: '*',
 });
+
 // app.use(compression());
 // app.use(cookieParser());
 
