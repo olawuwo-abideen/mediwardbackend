@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Treatment } from 'src/shared/entities/treatment.entity';
-import { User, UserRole } from 'src/shared/entities/user.entity';
+import { Treatment } from '../../../shared/entities/treatment.entity';
+import { User, UserRole } from '../../../shared/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateTreatmentDto, UpdateTreatmentDto } from '../dto/treatment.dto';
 

@@ -13,7 +13,7 @@ import { AdminAuthGuard } from './guards/adminguard';
 import { Admission } from '../../shared/entities/admission.entity';
 import { Appointment } from '../../shared/entities/appointment.entity';
 import { PassportModule } from '@nestjs/passport';
-import { Team } from 'src/shared/entities/team.entity';
+import { Team } from '../../shared/entities/team.entity';
 
 @Module({
 imports: [

@@ -7,7 +7,7 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
-import { Treatment } from 'src/shared/entities/treatment.entity';
+import { Treatment } from '../../shared/entities/treatment.entity';
 
 
 

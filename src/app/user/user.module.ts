@@ -7,11 +7,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { User } from '../../shared/entities/user.entity';
 import { Appointment } from '../../shared/entities/appointment.entity';
 import { PassportModule } from '@nestjs/passport';
-import { Treatment } from 'src/shared/entities/treatment.entity';
-import { Team } from 'src/shared/entities/team.entity';
-import { Ward } from 'src/shared/entities/ward.entity';
-import { Transfer } from 'src/shared/entities/transfer.entity';
-import { Admission } from 'src/shared/entities/admission.entity';
+import { Treatment } from '../../shared/entities/treatment.entity';
+import { Team } from '../../shared/entities/team.entity';
+import { Ward } from '../../shared/entities/ward.entity';
+import { Transfer } from '../../shared/entities/transfer.entity';
+import { Admission } from '../../shared/entities/admission.entity';
 
 @Module({
   imports: [

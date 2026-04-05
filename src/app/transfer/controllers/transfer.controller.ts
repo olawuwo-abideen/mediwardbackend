@@ -5,7 +5,7 @@ import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagg
 import { AuthGuard } from '../../../app/auth/guards/auth.guard';
 import { Roles } from '../../../shared/decorators/roles.decorator';
 import { User, UserRole } from '../../../shared/entities/user.entity';
-import { CurrentUser } from 'src/shared/decorators/current-user.decorator';
+import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 
 @ApiBearerAuth()
 @ApiTags('Transfers')

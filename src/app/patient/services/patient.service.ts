@@ -5,7 +5,7 @@ import { Admission, PatientStatus } from '../../../shared/entities/admission.ent
 import { User, UserRole } from '../../../shared/entities/user.entity';
 import { ILike, Repository, DataSource } from 'typeorm';
 import { AdmitPatientDto } from '../dto/patient.dto';
-import { Ward } from 'src/shared/entities/ward.entity';
+import { Ward } from '../../../shared/entities/ward.entity';
 
 @Injectable()
 export class PatientService {

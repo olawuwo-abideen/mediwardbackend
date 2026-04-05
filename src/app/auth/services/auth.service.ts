@@ -16,7 +16,7 @@ import { EmailService } from '../../../shared/modules/email/email.service';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcryptjs from "bcryptjs"
-import { VerificationService } from 'src/shared/services/verification/verification.service';
+import { VerificationService } from '../../../shared/services/verification/verification.service';
 import { ResendOtpDto, verifyOtpDto } from '../dto/verifyotp.dto';
 
 

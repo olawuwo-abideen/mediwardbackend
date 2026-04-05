@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Roles } from 'src/shared/decorators/roles.decorator';
-import { UserRole } from 'src/shared/entities/user.entity';
+import { Roles } from '../../../shared/decorators/roles.decorator';
+import { UserRole } from '../../../shared/entities/user.entity';
 import { CreateTreatmentDto, UpdateTreatmentDto } from '../dto/treatment.dto';
 import { TreatmentService } from '../services/treatment.service';
 

@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
 import { Admission } from '../../shared/entities/admission.entity';
 import { PassportModule } from '@nestjs/passport';
-import { Ward } from 'src/shared/entities/ward.entity';
+import { Ward } from '../../shared/entities/ward.entity';
 
 @Module({
   imports: [

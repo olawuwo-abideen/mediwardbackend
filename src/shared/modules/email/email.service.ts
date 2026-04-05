@@ -44,6 +44,7 @@ this.logger.log(`Email sent to ${options.to}`);
 } catch (error) {
 this.logger.error('Error sending email:', error);
 throw new BadRequestException('Failed to send email');
+
 }
 }
 
@@ -158,4 +159,6 @@ html,
 text,
 });
 }
+
+
 }

@@ -11,11 +11,11 @@ import * as bcryptjs from 'bcryptjs';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import {  UpdateProfileDto } from '../dto/update-profile.dto';
-import { Treatment } from 'src/shared/entities/treatment.entity';
-import { Ward } from 'src/shared/entities/ward.entity';
-import { Team } from 'src/shared/entities/team.entity';
-import { Transfer } from 'src/shared/entities/transfer.entity';
-import { Admission } from 'src/shared/entities/admission.entity';
+import { Treatment } from '../../../shared/entities/treatment.entity';
+import { Ward } from '../../../shared/entities/ward.entity';
+import { Team } from '../../../shared/entities/team.entity';
+import { Transfer } from '../../../shared/entities/transfer.entity';
+import { Admission } from '../../../shared/entities/admission.entity';
 
 @Injectable()
 export class UserService {

@@ -8,7 +8,7 @@ import { User } from '../../shared/entities/user.entity';
 import { EmailModule } from '../../shared/modules/email/email.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategy/jwt.strategy';
-import { VerificationModule } from 'src/shared/services/verification/verification.module';
+import { VerificationModule } from '../../shared/services/verification/verification.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
