@@ -18,18 +18,18 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       synchronize = false;
     }
 
-    return {
+return {
       type: 'mysql',
       host: this.configService.get<string>('DB_HOST'),
-      port: this.configService.get<number>('DB_PORT'),
+      port: Number(this.configService.get<string>('DB_PORT')),
       username: this.configService.get<string>('DB_USERNAME'),
       password: this.configService.get<string>('DB_PASSWORD'),
       database: this.configService.get<string>('DB_NAME'),
-  //       ssl: {
-  //   rejectUnauthorized: false,
-  // },
+      ssl: isProduction()
+        ? { rejectUnauthorized: false }
+        : false,
       autoLoadEntities: true,
-      synchronize
+      synchronize,
     };
   }
 }
