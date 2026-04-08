@@ -9,10 +9,11 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
 import { Transfer } from '../../shared/entities/transfer.entity';
+import { Admission } from 'src/shared/entities/admission.entity';
 
 @Module({
   imports: [
-  TypeOrmModule.forFeature([Ward, User, Transfer]),
+  TypeOrmModule.forFeature([Ward, User, Transfer, Admission]),
   JwtModule.register({}),
   UserModule,
   AuthModule,

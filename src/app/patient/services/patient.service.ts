@@ -41,6 +41,42 @@ totalItems: total,
 };
 }
 
+public async getPatientsAvailableForAdmission(
+  pagination: PaginationDto,
+): Promise<{
+  message: string;
+  data: User[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+}> {
+  const { page = 1, pageSize = 10 } = pagination;
+
+  const query = this.userRepository
+    .createQueryBuilder('user')
+    .leftJoin(
+      'user.admissions',
+      'admission',
+      'admission.isAdmitted = :isAdmitted',
+      { isAdmitted: true },
+    )
+    .where('user.role = :role', { role: UserRole.PATIENT })
+    .andWhere('admission.id IS NULL')
+    .skip((page - 1) * pageSize)
+    .take(pageSize);
+
+  console.log(query.getSql());
+
+  const [data, total] = await query.getManyAndCount();
+
+  return {
+    message: 'Available patients retrieved successfully',
+    data,
+    currentPage: page,
+    totalPages: Math.ceil(total / pageSize),
+    totalItems: total,
+  };
+}
 
 async searchPatientsByName(
 search: string,
@@ -82,7 +118,6 @@ throw new NotFoundException(`Patient not found`);
 return { message: 'Patient retrieved successfully', patient };
 }
 
-
 async admitPatient(
   patientId: string,
   admitPatientDto: AdmitPatientDto,
@@ -90,28 +125,26 @@ async admitPatient(
   const { wardId, reasonforadmission } = admitPatientDto;
 
   return await this.dataSource.transaction(async (manager) => {
-    // 1. Find patient
     const patient = await manager.findOne(User, {
       where: { id: patientId },
     });
-console.log(this.dataSource);
+
     if (!patient) {
       throw new NotFoundException('Patient not found.');
     }
 
-    // 2. Check active admission
     const active = await manager.findOne(Admission, {
       where: {
         patient: { id: patientId },
         isAdmitted: true,
       },
+      relations: ['patient'],
     });
 
     if (active) {
       throw new BadRequestException('Patient is already admitted.');
     }
 
-    // 3. Find ward
     const ward = await manager.findOne(Ward, {
       where: { id: wardId },
     });
@@ -120,24 +153,24 @@ console.log(this.dataSource);
       throw new NotFoundException('Ward not found.');
     }
 
-    // 4. Check capacity
-    if (ward.currentoccupancy >= ward.totaloccupancy) {
+    if (ward.bedoccupancy >= ward.bedcapacity) {
       throw new BadRequestException('Ward is full.');
     }
 
-    // 5. Assign patient to ward
     patient.ward = ward;
     await manager.save(patient);
 
-    // 6. Create admission
     const admission = manager.create(Admission, {
       patient,
+      ward,
       isAdmitted: true,
       admittedAt: new Date(),
       reasonforadmission,
     });
+
     await manager.save(admission);
-    ward.currentoccupancy += 1;
+
+    ward.bedoccupancy += 1;
     await manager.save(ward);
 
     return { message: 'Patient admitted successfully.' };
@@ -149,30 +182,45 @@ async dischargePatient(
   patientId: string,
   data: { reason: string },
 ): Promise<{ message: string }> {
+  return await this.dataSource.transaction(async (manager) => {
+    const patient = await manager.findOne(User, {
+      where: { id: patientId },
+      relations: ['ward'],
+    });
 
-  const patient = await this.userRepository.findOne({
-    where: { id: patientId },
+    if (!patient) {
+      throw new NotFoundException('Patient not found.');
+    }
+
+    const admission = await manager.findOne(Admission, {
+      where: {
+        patient: { id: patientId },
+        isAdmitted: true,
+      },
+      relations: ['patient', 'ward'],
+    });
+
+    if (!admission) {
+      throw new NotFoundException('Patient is not currently admitted.');
+    }
+
+    admission.isAdmitted = false;
+    admission.dischargedAt = new Date();
+    admission.dischargeReason = data.reason;
+    await manager.save(admission);
+
+    const ward = admission.ward || patient.ward;
+
+    if (ward) {
+      ward.bedoccupancy = Math.max(0, (ward.bedoccupancy ?? 0) - 1);
+      await manager.save(ward);
+    }
+
+    patient.ward = null;
+    await manager.save(patient);
+
+    return { message: 'Patient discharged successfully.' };
   });
-
-  if (!patient) {
-    throw new NotFoundException(`Patient not found.`);
-  }
-
-  const admission = await this.admissionRepository.findOne({
-    where: { patient: { id: patientId }, isAdmitted: true },
-  });
-
-  if (!admission) {
-    throw new NotFoundException('Patient is not currently admitted.');
-  }
-
-  admission.isAdmitted = false;
-  admission.dischargedAt = new Date();
-  admission.dischargeReason = data.reason;
-
-  await this.admissionRepository.save(admission);
-
-  return { message: 'Patient discharged successfully.' };
 }
 
 async getAdmissionHistory(patientId: string): Promise<{ message: string; history: { admittedAt: Date; dischargedAt: Date | null }[] }> {

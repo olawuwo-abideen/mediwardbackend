@@ -10,6 +10,7 @@ JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Exclude } from 'class-transformer';
+import { Ward } from './ward.entity';
 
 export enum PatientStatus {
 IN_PATIENT = 'in-patient',
@@ -44,6 +45,10 @@ dischargedAt: Date;
 
 @Column({ type: 'text', nullable: true })
 dischargeReason: string;
+
+
+@ManyToOne(() => Ward, (ward) => ward.admissions)
+ward: Ward;
 
 @CreateDateColumn({
 name: 'created_at',

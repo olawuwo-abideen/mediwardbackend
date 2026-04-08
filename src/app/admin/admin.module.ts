@@ -14,6 +14,8 @@ import { Admission } from '../../shared/entities/admission.entity';
 import { Appointment } from '../../shared/entities/appointment.entity';
 import { PassportModule } from '@nestjs/passport';
 import { Team } from '../../shared/entities/team.entity';
+import { Transfer } from '../../shared/entities/transfer.entity';
+import { Verification } from '../../shared/entities/verification.entity';
 
 @Module({
 imports: [
@@ -26,7 +28,7 @@ expiresIn: `${configService.get<string>('JWT_EXPIRES_IN')}`,
 },
 }),
 }),
-TypeOrmModule.forFeature([Admin, User, Ward, Admission, Appointment, Team]),
+TypeOrmModule.forFeature([Admin, User, Ward, Admission, Appointment, Team, Transfer, Verification]),
 PassportModule,
 UserModule,
 ConfigModule,

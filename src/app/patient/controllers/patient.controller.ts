@@ -12,79 +12,85 @@ import { AdmitPatientDto, DischargePatientDto } from '../dto/patient.dto';
 @ApiTags('Patient')
 @Controller('patient')
 export class PatientController {
+  constructor(private readonly patientService: PatientService) {}
 
-constructor(private readonly patientService: PatientService){}
+  @Get('')
+  @ApiOperation({ summary: 'Get all patients' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully retrieved patients.',
+  })
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.DOCTOR, UserRole.NURSE)
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'pageSize', required: false, example: 10 })
+  async getAllPatients(@Query() paginationData: PaginationDto) {
+    return await this.patientService.getAllPatients(paginationData);
+  }
 
+  @Get('available-for-admission')
+  @ApiOperation({ summary: 'Get all patients available for admission' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully retrieved patients.',
+  })
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.DOCTOR, UserRole.NURSE)
+  async getPatientsAvailableForAdmission(@Query() paginationData: PaginationDto) {
+    return this.patientService.getPatientsAvailableForAdmission(paginationData);
+  }
 
-@Get('')
-@ApiOperation({ summary: 'Get all patients' })
-@ApiResponse({
-status: HttpStatus.OK,
-description: 'Successfully retrieved patients.',
-})
-@UseGuards(AuthGuard)
-@Roles(UserRole.DOCTOR, UserRole.NURSE)
-@ApiQuery({ name: 'page', required: false, example: 1 })
-@ApiQuery({ name: 'pageSize', required: false, example: 10 })
-async getAllPatients(@Query() paginationData: PaginationDto) {
-return await this.patientService.getAllPatients(paginationData);
-}
+  @Get('search')
+  @ApiOperation({ summary: 'Search patients' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully retrieved patients.',
+  })
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.DOCTOR, UserRole.NURSE)
+  async searchPatientsByName(
+    @Query('search') search: string,
+    @Query() pagination: PaginationDto,
+  ) {
+    return this.patientService.searchPatientsByName(search, pagination);
+  }
 
-@Get('search')
-@ApiOperation({ summary: 'Search patients' })
-@ApiResponse({
-status: HttpStatus.OK,
-description: 'Successfully retrieved patients.',
-})
-@UseGuards(AuthGuard)
-@Roles(UserRole.DOCTOR, UserRole.NURSE)
-async searchPatientsByName(
-@Query('search') search: string,
-@Query() pagination: PaginationDto,
-) {
-return this.patientService.searchPatientsByName(search, pagination);
-}
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a patient' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully retrieved patient.',
+  })
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.DOCTOR, UserRole.NURSE)
+  async getPatient(@Param('id', IsValidUUIDPipe) id: string) {
+    return await this.patientService.getPatient(id);
+  }
 
+  @Post('admit/:patientId')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Admit a patient (doctor or nurse only)' })
+  @Roles(UserRole.DOCTOR, UserRole.NURSE)
+  async admitPatient(
+    @Param('patientId') patientId: string,
+    @Body() admitPatientDto: AdmitPatientDto,
+  ) {
+    return this.patientService.admitPatient(patientId, admitPatientDto);
+  }
 
-@Get(':id')
-@ApiOperation({ summary: 'Get a patients' })
-@ApiResponse({
-status: HttpStatus.OK,
-description: 'Successfully retrieved patients.',
-})
-@UseGuards(AuthGuard)
-@Roles(UserRole.DOCTOR, UserRole.NURSE)
-@ApiOperation({ summary: 'Get a bed' })
-public async getPatient(
-@Param('id', IsValidUUIDPipe) id: string,
-) {
-return await this.patientService.getPatient(id)
-}
-
-
-
-
-@Post('admit/:patientId')
-@ApiOperation({ summary: 'Admit a patient (doctor or nurse only)' })
-@Roles(UserRole.DOCTOR, UserRole.NURSE)
-async admitPatient(
-  @Param('patientId') patientId: string,
-  @Body() admitPatientDto: AdmitPatientDto, 
-) {
-  return this.patientService.admitPatient(patientId, admitPatientDto);
-}
-
-@Post('discharge/:patientId')
-@ApiOperation({ summary: 'Discharge a patient (doctor only)' })
-@Roles(UserRole.DOCTOR)
-async dischargePatient(
-  @Param('patientId') patientId: string,
-  @Body() data: DischargePatientDto,
-) {
-  return this.patientService.dischargePatient(patientId, data);
-}
+  @Post('discharge/:patientId')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Discharge a patient (doctor only)' })
+  @Roles(UserRole.DOCTOR)
+  async dischargePatient(
+    @Param('patientId') patientId: string,
+    @Body() data: DischargePatientDto,
+  ) {
+    return this.patientService.dischargePatient(patientId, data);
+  }
 
   @Get('history/:patientId')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get admission history of a patient' })
   @Roles(UserRole.DOCTOR, UserRole.NURSE)
   async getHistory(@Param('patientId') patientId: string) {
@@ -92,11 +98,10 @@ async dischargePatient(
   }
 
   @Get('status/:patientId')
+  @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Get current admission status of a patient' })
   @Roles(UserRole.DOCTOR, UserRole.NURSE)
   async getStatus(@Param('patientId') patientId: string) {
     return this.patientService.getCurrentStatus(patientId);
   }
-
-
 }

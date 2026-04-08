@@ -8,7 +8,7 @@ UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Admin } from '../../../shared/entities/admin.entity';
-import { Between, FindOptionsWhere, ILike, In, Not, Repository } from 'typeorm';
+import { Between, DataSource, FindOptionsWhere, ILike, In, Not, Repository } from 'typeorm';
 import { AdminLoginDto } from '../dto/admin-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -21,6 +21,8 @@ import { PaginationDto } from '../../../shared/dtos/pagination.dto';
 import { Admission } from '../../../shared/entities/admission.entity';
 import { Appointment } from '../../../shared/entities/appointment.entity';
 import { CreateTeamDto, UpdateTeamDto } from '../dto/team.dto';
+import { Transfer } from 'src/shared/entities/transfer.entity';
+import { Verification } from 'src/shared/entities/verification.entity';
 
 
 
@@ -41,7 +43,11 @@ private readonly userRepository: Repository<User>,
 private readonly admissionRepository: Repository<Admission>,
 @InjectRepository(Appointment) 
 private readonly appointmentRepository: Repository<Appointment>,
-
+@InjectRepository(Transfer)
+private readonly transferRepository: Repository<Transfer>,
+@InjectRepository(Verification)
+private readonly verificationRepository: Repository<Verification>,
+private readonly dataSource: DataSource,
 ) {}
 
 async onModuleInit() {
@@ -289,13 +295,36 @@ return { message: 'User retrieved successfully', user };
 
 
 public async deleteUser(params: { id: string }): Promise<{ message: string }> {
-const { id } = params;
-const user = await this.userRepository.findOne({ where: { id } });
-if (!user) {
-throw new NotFoundException(`User not found.`);
-}
-await this.userRepository.delete(id);
-return { message: `User deleted successfully .` };
+  const { id } = params;
+
+  const user = await this.userRepository.findOne({ where: { id } });
+
+  if (!user) {
+    throw new NotFoundException(`User not found.`);
+  }
+
+  await this.dataSource.transaction(async (manager) => {
+    // delete transfer records linked to the user
+    await manager
+      .createQueryBuilder()
+      .delete()
+      .from(Transfer)
+      .where('patientId = :id', { id })
+      .execute();
+
+    // delete verification records linked to the user
+    await manager
+      .createQueryBuilder()
+      .delete()
+      .from(Verification)
+      .where('userId = :id', { id })
+      .execute();
+
+    // finally delete the user
+    await manager.delete(User, id);
+  });
+
+  return { message: `User deleted successfully.` };
 }
 
 
@@ -416,8 +445,8 @@ public async getWard(id: string): Promise<{ message: string; ward: Ward }> {
     select: {
       id: true,
       name: true,
-      currentoccupancy: true,
-      totaloccupancy: true,
+      bedoccupancy: true,
+      bedcapacity: true,
       createdAt: true,
       updatedAt: true,
       patients: {

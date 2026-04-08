@@ -8,6 +8,7 @@ UpdateDateColumn,
 DeleteDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Admission } from './admission.entity';
 
 
 
@@ -22,13 +23,16 @@ name: string;
 
 
 @Column({ type: 'int', default: 0 })
-currentoccupancy: number;
+bedoccupancy: number;
 
 @Column({ type: 'int', default: 30 })
-totaloccupancy: number;
+bedcapacity: number;
 
 @OneToMany(() => User, (user) => user.ward)
 patients: User[];
+
+@OneToMany(() => Admission, (admission) => admission.ward)
+admissions: Admission[];
 
 
 @CreateDateColumn({

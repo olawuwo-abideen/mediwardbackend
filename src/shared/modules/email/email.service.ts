@@ -20,7 +20,13 @@ export class EmailService {
 private readonly logger = new Logger(EmailService.name);
 private mailTransport: Transporter;
 
+
+
 constructor(
+
+
+
+    
 private configService: ConfigService,
 private jwtService: JwtService,
 @InjectRepository(User)
@@ -31,10 +37,15 @@ host: this.configService.get('MAIL_HOST'),
 port: Number(this.configService.get('MAIL_PORT')),
 secure: false, // use TLS in production if needed
 auth: {
-user: this.configService.get('MAIL_USER'),
+user: this.configService.get('MAIL_USERNAME'),
 pass: this.configService.get('MAIL_PASSWORD'),
+
+
 },
+
+
 });
+
 }
 
 private async sendMail(options: SendMailOptions) {
