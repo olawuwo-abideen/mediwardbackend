@@ -47,24 +47,72 @@
     availability: savedAvailability,
   };
 }
-  // async setAvailabilitySlot(
-  // user: User,
-  // data: SetAvailabilityDto
-  // ): Promise<{ message: string; availability: AvailabilitySlot }> {
-  // const availability = this.availabilitySlotRepository.create({
-  // user: { id: user.id }, 
-  // startTime: data.startTime,
-  // endTime: data.endTime,
-  // isAvailable: data.isAvailable,
-  // });
 
-  // const savedAvailability = await this.availabilitySlotRepository.save(availability);
+async getDoctors(): Promise<{ message: string; data: User[] }> {
+  const doctors = await this.userRepository.find({
+    where: { role: UserRole.DOCTOR },
+    select: ['id', 'firstname', 'lastname', 'email'],
+    order: { firstname: 'ASC' },
+  });
 
-  // return {
-  // message: 'Availability slot created successfully',
-  // availability: savedAvailability,
-  // };
-  // }
+  return {
+    message: 'Doctors retrieved successfully',
+    data: doctors,
+  };
+}
+
+async getDoctorAvailability(
+  doctorId: string,
+): Promise<{ message: string; data: AvailabilitySlot[] }> {
+  const doctor = await this.userRepository.findOne({
+    where: { id: doctorId, role: UserRole.DOCTOR },
+  });
+
+  if (!doctor) {
+    throw new NotFoundException('Doctor not found');
+  }
+
+  const slots = await this.availabilitySlotRepository.find({
+    where: {
+      user: { id: doctorId },
+      isAvailable: true,
+    },
+    order: { startTime: 'ASC' },
+  });
+
+  return {
+    message: 'Availability slots retrieved successfully',
+    data: slots,
+  };
+}
+
+// async getDoctorAvailability(
+//   doctorId: string,
+// ): Promise<{ message: string; data: AvailabilitySlot[] }> {
+//   const doctor = await this.userRepository.findOne({
+//     where: { id: doctorId, role: UserRole.DOCTOR },
+//   });
+
+//   if (!doctor) {
+//     throw new NotFoundException('Doctor not found');
+//   }
+
+//   const slots = await this.availabilitySlotRepository.find({
+//     where: {
+//       user: { id: doctorId },
+//       isAvailable: true,
+//     },
+//     relations: ['user'],
+//     order: { startTime: 'ASC' },
+//   });
+
+//   return {
+//     message: 'Availability slots retrieved successfully',
+//     data: slots,
+//   };
+// }
+
+
 
 async getAvailabilitySlots(user: User): Promise<{ message: string; availabilitySlots: AvailabilitySlot[] }> {
 

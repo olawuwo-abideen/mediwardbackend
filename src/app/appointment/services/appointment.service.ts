@@ -20,45 +20,6 @@ private readonly availabilitySlotRepository: Repository<AvailabilitySlot>,
 private readonly emailService: EmailService,
 ) {}
 
-// async bookAppointment(
-//   user: User,
-//   { availabilitySlotId }: BookAppointmentDto,
-// ): Promise<{ message: string; appointment: Appointment }> {
-
-//   // Fetch availability slot along with its doctor
-//   const availabilitySlot = await this.availabilitySlotRepository.findOne({
-//     where: { id: availabilitySlotId },
-//     relations: ['user'], // assuming 'user' is the doctor in AvailabilitySlot
-//   });
-
-//   if (!availabilitySlot) {
-//     throw new NotFoundException('Availability slot not found');
-//   }
-
-//   if (!availabilitySlot.isAvailable) {
-//     throw new BadRequestException('This slot is already booked');
-//   }
-
-//   // Mark slot as booked
-//   await this.availabilitySlotRepository.update(availabilitySlot.id, { isAvailable: false });
-
-//   // Create appointment
-//   const appointment = this.appointmentRepository.create({
-//     user, // the patient booking
-//     doctor: availabilitySlot.user, // doctor is inferred from slot
-//     availabilitySlot,
-//     status: AppointmentStatus.CONFIRMED,
-//   });
-
-//   return {
-//     message: 'Appointment booked successfully',
-//     appointment: await this.appointmentRepository.save(appointment),
-//   };
-// }
-
-
-
-
 async bookAppointment(
   user: User,
   { availabilitySlotId }: BookAppointmentDto,
@@ -123,15 +84,15 @@ data: appointments,
 }
 
 async getDoctorAppointments(user: User): Promise<{ message: string; data: Appointment[] }> {
-const appointments = await this.appointmentRepository.find({
-where: { user: { id: user.id } },
-relations: ['patient', 'availabilitySlot'],
-});
+  const appointments = await this.appointmentRepository.find({
+    where: { doctor: { id: user.id } },
+    relations: ['user', 'doctor', 'availabilitySlot'],
+  });
 
-return {
-message: 'Doctor appointments retrieved successfully',
-data: appointments,
-};
+  return {
+    message: 'Doctor appointments retrieved successfully',
+    data: appointments,
+  };
 }
 
 async getAppointmentDetails(user: User, id: string): Promise<{ message: string; data: Appointment }> {

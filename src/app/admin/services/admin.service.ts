@@ -389,12 +389,16 @@ return { message: 'Ward updated successfully', ward: updatedWard };
 }
 
 public async deleteWard(id: string): Promise<{ message: string }> {
-const ward = await this.wardRepository.findOne({ where: { id } });
-if (!ward) {
-throw new NotFoundException(`Ward not found`);
-}
-await this.wardRepository.delete(id);
-return { message: 'Ward deleted successfully' };
+  const ward = await this.wardRepository.findOne({ where: { id } });
+
+  if (!ward) {
+    throw new NotFoundException('Ward not found');
+  }
+
+  await this.admissionRepository.delete({ ward: { id } });
+  await this.wardRepository.delete(id);
+
+  return { message: 'Ward and related admissions deleted successfully' };
 }
 
 

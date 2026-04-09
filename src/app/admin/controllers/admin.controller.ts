@@ -153,6 +153,7 @@ public async deleteWard(
 return await this.adminService.deleteWard(id)
 }
 
+
 @ApiBearerAuth()
 @Get('ward/total')
 @ApiOperation({ summary: 'Get total number of ward' })

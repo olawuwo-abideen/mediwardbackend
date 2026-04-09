@@ -69,9 +69,6 @@ emailVerifiedAt: Date;
 
 
 
-// @Column({ default:false })
-// accountActivation: boolean;
-
 @Column()
 @Exclude()
 password: string;

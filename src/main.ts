@@ -15,9 +15,23 @@ app.useGlobalFilters(new HttpExceptionFilter(httpAdapter));
 app.useGlobalInterceptors(new HttpResponseInterceptor());
 app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
+// app.enableCors({
+//   origin: '*',
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//   credentials: true,
+// });
+
 app.enableCors({
-  origin: '*',
+  origin: [
+    'http://127.0.0.1:5500',
+    'http://localhost:3000',
+    'https://mediwardbackend.vercel.app'
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false,
 });
+
 
 // app.use(compression());
 // app.use(cookieParser());
@@ -53,7 +67,7 @@ app.getHttpAdapter().get('/', (_, res) => {
 res.redirect('/docs');
 });
 
-await app.listen(3000);
+await app.listen(process.env.PORT  ||3000);
 }
 
 bootstrap();

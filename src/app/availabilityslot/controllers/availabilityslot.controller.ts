@@ -31,6 +31,18 @@ async setAvailabilitySlot(
 return this.availabilityslotService.setAvailabilitySlot(user, data);
 }
 
+@Get('/doctors')
+@ApiOperation({ summary: 'Get all doctors' })
+async getDoctors() {
+  return this.availabilityslotService.getDoctors();
+}
+
+@Get('/doctor/:doctorId')
+@ApiOperation({ summary: 'Get availability slots by doctor' })
+async getDoctorAvailability(@Param('doctorId') doctorId: string) {
+  return this.availabilityslotService.getDoctorAvailability(doctorId);
+}
+
 @Get('')
 @UseGuards(AuthGuard)
 @Roles(UserRole.DOCTOR, UserRole.PATIENT)
